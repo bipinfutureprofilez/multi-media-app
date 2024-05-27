@@ -4,17 +4,29 @@ import connectDB from "./db/connection.js";
 
 const port = process.env.PORT || 8000;
 
-connectDB();
-(async () => {
-    try {
-        app.on("error", (error) => {
-            console.log("Error: ", error);
-            throw error;
-        })
-        app.listen(port, () => console.log(`Server is running at: ${port}`))
+connectDB()
+.then(() => {
+    app.on("error", (error) => {
+        console.log("Error: ", error);
+        throw error
+    })
+    app.listen(port, () => console.log(`Server is running at: ${port}`));
+})
+.catch((err) => {
+    console.log("Error: ", err);
+})
 
-    } catch (error) {
-        console.log(error);
-        throw error;
-    }
-})()
+
+// (async () => {
+//     try {
+//         app.on("error", (error) => {
+//             console.log("Error: ", error);
+//             throw error;
+//         })
+//         app.listen(port, () => console.log(`Server is running at: ${port}`))
+
+//     } catch (error) {
+//         console.log(error);
+//         throw error;
+//     }
+// })()
