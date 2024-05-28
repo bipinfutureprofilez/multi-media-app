@@ -10,7 +10,7 @@ connectDB()
         console.log("Error: ", error);
         throw error
     })
-    app.listen(port, () => console.log(`Server is running at: ${port}`));
+    app.listen(port, () => console.log(`\nServer is running at: ${port}`));
 })
 .catch((err) => {
     console.log("Error: ", err);
