@@ -60,4 +60,8 @@ userSchema.methods.createToken = async function(){
     return await jwt.sign({ id: this._id, name: this.fullName }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRY})
 }
 
+userSchema.methods.createRefreshToken = async function () {
+    return await jwt.sign({ id: this._id }, process.env.REFRESH_TOKEN_SECRET, { expiresIn: process.env.REFRESH_TOKEN_EXPIRY })
+}
+
 export const User = mongoose.model('User', userSchema)
