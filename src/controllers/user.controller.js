@@ -25,8 +25,6 @@ const registerUser = asyncHandler( async (req, res) => {
     const avatarPath = req.files?.avatar[0].path;
     const coverImagePath = req.files?.coverImage[0].path;
 
-    console.log('Avatar image: ', avatarPath);
-    console.log('coverImage image: ', coverImagePath);
     if (!avatarPath) {
         throw new ApiError(400, "Avatar image is not uploaded!");
     }
@@ -59,4 +57,27 @@ const registerUser = asyncHandler( async (req, res) => {
 
 })
 
-export {registerUser}
+const loginUser = asyncHandler( async (req, res) => {
+
+    const {email, password} = req.body;
+    if (!email || !password) {
+        throw new ApiError(400, "Invalid credential!");
+    }
+    const user = await User.findOne({ email });
+
+    if (!user) {
+        throw new ApiError(400, "Invalid credential!");
+    }
+
+    const checkPassword = user.comparePassword(password);
+
+    if (!checkPassword) {
+        throw new ApiError(400, "Invalid credential!");
+    }
+
+    res.status(200).json(
+        new ApiResponse(200, user, "Login successfully")
+    );
+})
+
+export { registerUser, loginUser }
