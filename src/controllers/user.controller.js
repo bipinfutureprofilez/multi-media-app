@@ -3,6 +3,7 @@ import { ApiError } from "../utils/apiError.js";
 import { User } from "../models/user.model.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
 import { ApiResponse } from "../utils/apiResponse.js";
+import jwt from "jsonwebtoken"
 
 const registerUser = asyncHandler( async (req, res) => {
     // Get fields value from req.body
@@ -69,10 +70,10 @@ const loginUser = asyncHandler( async (req, res) => {
         throw new ApiError(400, "Invalid credential!");
     }
 
-    const checkPassword = user.comparePassword(password);
+    const checkPassword = await user.comparePassword(password);
 
     if (!checkPassword) {
-        throw new ApiError(400, "Invalid credential!");
+        throw new ApiError(400, "Incorrect password!");
     }
 
     const genAccessToken = await user.createToken();
@@ -127,4 +128,129 @@ const logoutUser = asyncHandler(async (req, res) => {
 
 })
 
-export { registerUser, loginUser, logoutUser }
+const refreshTokenAccess = asyncHandler( async (req, res) => {
+    const incomingRefreshToken = req.cookies?.refreshToken || req.body.refreshToken;
+
+    if (!incomingRefreshToken) {
+        throw new ApiError(401,'Unauthorized user!')
+    }
+
+    const tokenDecoded = await jwt.verify(incomingRefreshToken, process.env.REFRESH_TOKEN_SECRET);
+
+    const user = await User.findById(tokenDecoded?.id).select("-password");
+
+    if (!user) {
+        throw new ApiError(401, 'Bad request!')
+    }
+
+    if (user.refreshToken !== incomingRefreshToken){
+        throw new ApiError(401, 'Invalid token!');
+    }
+
+    const newAccessToken = await user.createToken();
+
+    const options = {
+        httpOnly: true,
+        secure: true
+    }
+
+    res
+    .status(200)
+    .cookie("accessToken", newAccessToken, options)
+    .cookie("refreshToken", incomingRefreshToken, options)
+    .json(
+        new ApiResponse(200, {}, 'Access token refreshed successfully')
+    )
+
+}) 
+
+const changeCurrentPassword = asyncHandler(async (req, res) => {
+    const { oldPassword, newPassword } = req.body;
+    const user = await User.findById(req.user?._id);
+
+    if (!user) {
+        throw new ApiError(400, "Bad Request!")
+    }
+
+    const isPasswordCorrect = await user.comparePassword(oldPassword);
+    if (!isPasswordCorrect) {
+        throw new ApiError(400, "Invalid password!")
+    }
+
+    user.password = newPassword;
+    await user.save({validateBeforeSave: false});
+
+    res
+    .status(200)
+    .json(
+        new ApiResponse(
+            200,
+            { user },
+            "Password has changed successfully."
+        )
+    )
+
+})
+
+const changeAvatarImage = asyncHandler(async (req, res) => {
+    const { _id: userId } = req.user;
+    const user = await User.findById(userId).select("-password")
+
+    if (!user) {
+        throw new ApiError(401, "Unauthorized user!");
+    }
+
+    const avatarPath = req.files?.avatar[0].path;
+
+    if (!avatarPath) {
+        throw new ApiError(400, "Avatar image is not uploaded!");
+    }
+
+    const avatar = await uploadOnCloudinary(avatarPath)
+    
+    user.avatar = avatar.url;
+    await user.save({validateBeforeSave: false});
+
+    res
+    .status(200)
+    .json(
+        new ApiResponse(
+            200,
+            { avatar: user.avatar },
+            "Avatar image updated!"
+        )
+    );
+
+})
+
+const changeCoverImage = asyncHandler(async (req, res) => {
+    const { _id: userId } = req.user;
+    const user = await User.findById(userId).select("-password")
+
+    if (!user) {
+        throw new ApiError(401, "Unauthorized user!");
+    }
+
+    const coverPath = req.files?.coverImage[0].path;
+
+    if (!coverPath) {
+        throw new ApiError(400, "Cover image is not uploaded!");
+    }
+
+    const coverImage = await uploadOnCloudinary(coverPath)
+    user.coverImage = coverImage.url;
+    await user.save({ validateBeforeSave: false });
+
+    res
+        .status(200)
+        .json(
+            new ApiResponse(
+                200,
+                { coverImage: user.coverImage },
+                "Avatar image updated!"
+            )
+        );
+
+})
+
+export { registerUser, loginUser, logoutUser, refreshTokenAccess, changeCurrentPassword, changeAvatarImage, changeCoverImage }
