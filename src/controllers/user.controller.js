@@ -253,4 +253,12 @@ const changeCoverImage = asyncHandler(async (req, res) => {
 
 })
 
-export { registerUser, loginUser, logoutUser, refreshTokenAccess, changeCurrentPassword, changeAvatarImage, changeCoverImage }
+const currentUser = asyncHandler( async (req, res) => {
+    res
+    .status(200)
+    .json(
+        new ApiResponse(200, req.user, "Ok")
+    )
+});
+
+export { registerUser, loginUser, logoutUser, refreshTokenAccess, changeCurrentPassword, changeAvatarImage, changeCoverImage, currentUser }

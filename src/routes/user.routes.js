@@ -1,7 +1,7 @@
 import express from "express";
 const router = express.Router();
 
-import { registerUser, loginUser, logoutUser, refreshTokenAccess, changeCurrentPassword, changeAvatarImage, changeCoverImage } from "../controllers/user.controller.js";
+import { registerUser, loginUser, logoutUser, refreshTokenAccess, changeCurrentPassword, changeAvatarImage, changeCoverImage, currentUser } from "../controllers/user.controller.js";
 import { upload } from "../middlewares/multer.middleware.js";
 import { authenticateUser } from "../middlewares/auth.middleware.js";
 
@@ -32,7 +32,7 @@ router.route('/changeAvatar').post(
         }
     ]),
     changeAvatarImage
-)
+);
 router.route('/changeCoverImage').post(
     authenticateUser,
     upload.fields([
@@ -42,6 +42,8 @@ router.route('/changeCoverImage').post(
         }
     ]),
     changeCoverImage
-)
+);
+
+router.route('/my-profile').get(authenticateUser, currentUser);
 
 export default router;
