@@ -253,7 +253,7 @@ const changeCoverImage = asyncHandler(async (req, res) => {
 
 })
 
-const currentUser = asyncHandler( async (req, res) => {
+const getCurrentUser = asyncHandler( async (req, res) => {
     res
     .status(200)
     .json(
@@ -261,4 +261,6 @@ const currentUser = asyncHandler( async (req, res) => {
     )
 });
 
-export { registerUser, loginUser, logoutUser, refreshTokenAccess, changeCurrentPassword, changeAvatarImage, changeCoverImage, currentUser }
+
+
+export { registerUser, loginUser, logoutUser, refreshTokenAccess, changeCurrentPassword, changeAvatarImage, changeCoverImage, getCurrentUser }

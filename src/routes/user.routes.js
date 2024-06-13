@@ -1,7 +1,7 @@
 import express from "express";
 const router = express.Router();
 
-import { registerUser, loginUser, logoutUser, refreshTokenAccess, changeCurrentPassword, changeAvatarImage, changeCoverImage, currentUser } from "../controllers/user.controller.js";
+import { registerUser, loginUser, logoutUser, refreshTokenAccess, changeCurrentPassword, changeAvatarImage, changeCoverImage, getCurrentUser } from "../controllers/user.controller.js";
 import { upload } from "../middlewares/multer.middleware.js";
 import { authenticateUser } from "../middlewares/auth.middleware.js";
 
@@ -44,6 +44,6 @@ router.route('/changeCoverImage').post(
     changeCoverImage
 );
 
-router.route('/my-profile').get(authenticateUser, currentUser);
+router.route('/my-profile').get(authenticateUser, getCurrentUser);
 
 export default router;
