@@ -9,7 +9,7 @@ router.route('/').post(
     authenticateUser, 
     upload.fields([
         {
-            name: "videos",
+            name: "video",
             maxCount: 1
         }
     ]),
