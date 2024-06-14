@@ -261,6 +261,10 @@ const getCurrentUser = asyncHandler( async (req, res) => {
     )
 });
 
+const getUserChannelProfile = asyncHandler( async (req, res) => {
+    // const 
+})
+
 
 
 export { registerUser, loginUser, logoutUser, refreshTokenAccess, changeCurrentPassword, changeAvatarImage, changeCoverImage, getCurrentUser }
