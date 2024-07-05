@@ -3,7 +3,8 @@ import { ApiError } from "../utils/apiError.js";
 import { User } from "../models/user.model.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
 import { ApiResponse } from "../utils/apiResponse.js";
-import jwt from "jsonwebtoken"
+import jwt from "jsonwebtoken";
+import { sendMail } from "../utils/mailer.js";
 
 const registerUser = asyncHandler( async (req, res) => {
     // Get fields value from req.body
@@ -51,6 +52,8 @@ const registerUser = asyncHandler( async (req, res) => {
     if (!response) {
         throw new ApiError(500, "Something went wrong while register the user!");
     }
+    console.log('user: ', user.email);
+    await sendMail(user.email, 'Welcome to out platform', "You have succssfully loged in...!")
 
     res.status(201).json(
         new ApiResponse(201, response, "User created successfully!")
